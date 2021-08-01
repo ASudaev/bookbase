@@ -1,0 +1,6 @@
+#environment settings
+/.env
+/.env.local
+
+# phpstorm project files
+.idea
