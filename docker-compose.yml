@@ -32,6 +32,18 @@ services:
     depends_on:
       - bookbase-db
 
+  bookbase-install:
+    container_name: "bookbase-install"
+    build:
+      context: ./php
+    volumes:
+      - ./www:/var/www/bookbase
+    command:
+      composer install --no-dev --optimize-autoloader
+    depends_on:
+      - bookbase-php
+      - bookbase-db
+
   bookbase-nginx:
     container_name: "bookbase-nginx"
     image: nginx:stable-alpine
@@ -41,5 +53,6 @@ services:
       - ./www:/var/www/bookbase
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
+      - bookbase-install
       - bookbase-php
       - bookbase-db
