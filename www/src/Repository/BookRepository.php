@@ -19,32 +19,36 @@ class BookRepository extends ServiceEntityRepository
         parent::__construct($registry, Book::class);
     }
 
-    // /**
-    //  * @return Book[] Returns an array of Book objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param string $name
+     *
+     * @return Book[] Returns an array of Book objects
+     */
+    public function findByName(string $name): array
     {
         return $this->createQueryBuilder('b')
-            ->andWhere('b.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('b.id', 'ASC')
-            ->setMaxResults(10)
+            ->where('b.name_en LIKE :val')
+            ->orWhere('b.name_ru LIKE :val')
+            ->setParameter('val', '%' . $name . '%')
+            ->orderBy('b.name_en', 'ASC')
+            ->orderBy('b.name_ru', 'ASC')
+            ->setMaxResults(100)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Book
+    /**
+     * @param $id
+     *
+     * @return Book|null
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function findById($id): ?Book
     {
         return $this->createQueryBuilder('b')
-            ->andWhere('b.exampleField = :val')
-            ->setParameter('val', $value)
+            ->andWhere('b.id = :val')
+            ->setParameter('val', $id)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getOneOrNullResult();
     }
-    */
 }

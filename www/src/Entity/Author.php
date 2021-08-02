@@ -10,8 +10,13 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=AuthorRepository::class)
  */
-class Author
+class Author implements \JsonSerializable
 {
+    /**
+     * Maximum name length
+     */
+    public const NAME_MAX_LENGTH = 1000;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -46,7 +51,7 @@ class Author
 
     public function setName(string $name): self
     {
-        $this->name = $name;
+        $this->name = mb_substr($name, 0, self::NAME_MAX_LENGTH);
 
         return $this;
     }
@@ -76,5 +81,13 @@ class Author
         }
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'Id' => $this->getId(),
+            'Name' => $this->getName(),
+        ];
     }
 }

@@ -10,8 +10,13 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=BookRepository::class)
  */
-class Book
+class Book implements \JsonSerializable
 {
+    /**
+     * Maximum name length
+     */
+    public const NAME_MAX_LENGTH = 1000;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -51,7 +56,7 @@ class Book
 
     public function setNameEn(string $name_en): self
     {
-        $this->name_en = $name_en;
+        $this->name_en = mb_substr($name_en, 0, self::NAME_MAX_LENGTH);
 
         return $this;
     }
@@ -63,9 +68,28 @@ class Book
 
     public function setNameRu(string $name_ru): self
     {
-        $this->name_ru = $name_ru;
+        $this->name_ru = mb_substr($name_ru, 0, self::NAME_MAX_LENGTH);
 
         return $this;
+    }
+
+    public function getName(): ?string
+    {
+        $names = [];
+
+        if ($this->getNameEn())
+        {
+            $names[] = $this->getNameEn();
+        }
+
+        if ($this->getNameRu())
+        {
+            $names[] = $this->getNameRu();
+        }
+
+        return (count($names) > 0)
+            ? implode('|', $names)
+            : null;
     }
 
     /**
@@ -78,7 +102,8 @@ class Book
 
     public function addAuthor(Author $author): self
     {
-        if (!$this->authors->contains($author)) {
+        if (!$this->authors->contains($author))
+        {
             $this->authors[] = $author;
         }
 
@@ -90,5 +115,26 @@ class Book
         $this->authors->removeElement($author);
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        $result = [
+            'Id' => $this->getId(),
+            'Name' => $this->getName(),
+            'Author' => [],
+            ];
+
+        $authors = $this->getAuthors();
+
+        if ($authors)
+        {
+            foreach ($authors as $author)
+            {
+                $result['Author'][] = $author->jsonSerialize();
+            }
+        }
+
+        return $result;
     }
 }

@@ -19,32 +19,65 @@ class AuthorRepository extends ServiceEntityRepository
         parent::__construct($registry, Author::class);
     }
 
-    // /**
-    //  * @return Author[] Returns an array of Author objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @param string $name
+     *
+     * @return Author[] Returns an array of Author objects
+     */
+    public function findByName(string $name): array
     {
         return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('a.id', 'ASC')
-            ->setMaxResults(10)
+            ->andWhere('a.name LIKE :val')
+            ->setParameter('val', '%' . $name . '%')
+            ->orderBy('a.name', 'ASC')
+            ->setMaxResults(100)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Author
+    /**
+     * @param string $name
+     *
+     * @return Author|null
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function findByNameStrict(string $name): ?Author
     {
         return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
+            ->andWhere('a.name LIKE :val')
+            ->setParameter('val', $name)
+            ->orderBy('a.id', 'ASC')
+            ->setMaxResults(1)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getOneOrNullResult();
     }
-    */
+
+    /**
+     * @param $id
+     *
+     * @return Author|null
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function findById($id): ?Author
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.id = :val')
+            ->setParameter('val', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @param string[] $ids
+     *
+     * @return array
+     */
+    public function findByIds(array $ids): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.id IN (:val)')
+            ->setParameter('val', $ids)
+            ->getQuery()
+            ->getResult();
+    }
 }
