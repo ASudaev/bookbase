@@ -60,3 +60,17 @@ services:
       - bookbase-install
       - bookbase-php
       - bookbase-db
+
+  bookbase-pma:
+    container_name: "bookbase-pma"
+    image: phpmyadmin:latest
+    restart: always
+    ports:
+      - "${PMA_PORT}:80"
+    environment:
+      PMA_HOST: bookbase-db
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
+    depends_on:
+      - bookbase-db
+    profiles: ["dev"]
