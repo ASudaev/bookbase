@@ -8,13 +8,14 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_DATABASE: bookbase
+      MYSQL_USER: bookbase
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "${MYSQL_PORT}:3306"
     volumes:
       - "./mysql:/var/lib/mysql"
+      - "./mysql-init:/docker-entrypoint-initdb.d"
 
   bookbase-php:
     container_name: "bookbase-php"
@@ -23,7 +24,7 @@ services:
     environment:
       APP_ENV: ${APP_ENV}
       APP_SECRET: ${APP_SECRET}
-      DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@bookbase-db:3306/${MYSQL_DATABASE}?serverVersion=8.0"
+      DATABASE_URL: "mysql://bookbase:${MYSQL_PASSWORD}@bookbase-db:3306/bookbase?serverVersion=8.0"
     ports:
       - "9000:9000"
     volumes:
@@ -38,7 +39,7 @@ services:
     environment:
       APP_ENV: ${APP_ENV}
       APP_SECRET: ${APP_SECRET}
-      DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@bookbase-db:3306/${MYSQL_DATABASE}?serverVersion=8.0"
+      DATABASE_URL: "mysql://bookbase:${MYSQL_PASSWORD}@bookbase-db:3306/bookbase?serverVersion=8.0"
     volumes:
       - "./www:/var/www/bookbase"
       - "./install/install.sh:/install.sh"
@@ -69,7 +70,7 @@ services:
       - "${PMA_PORT}:80"
     environment:
       PMA_HOST: bookbase-db
-      PMA_USER: ${MYSQL_USER}
+      PMA_USER: bookbase
       PMA_PASSWORD: ${MYSQL_PASSWORD}
     depends_on:
       - bookbase-db
