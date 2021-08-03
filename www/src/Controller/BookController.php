@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class BookController extends AbstractController
 {
@@ -58,7 +59,7 @@ class BookController extends AbstractController
      * @Route("/book/create", name="book_create", methods={"POST"})
      * @param Request $request
      * @param EntityManagerInterface $entityManager
-     * @param BookRepository $bookRepository
+     * @param ValidatorInterface $validator
      * @param AuthorRepository $authorRepository
      *
      * @return Response
@@ -66,31 +67,25 @@ class BookController extends AbstractController
     public function create(
         Request $request,
         EntityManagerInterface $entityManager,
-        BookRepository $bookRepository,
+        ValidatorInterface $validator,
         AuthorRepository $authorRepository
     ): Response
     {
-        $name_ru = $request->request->get('name_ru');
-        if (!isset($name_ru) || (trim($name_ru) === ''))
+        $book = new Book();
+        $book->setNameRu(trim($request->request->get('name_ru')));
+        $book->setNameEn(trim($request->request->get('name_en')));
+
+        $errors = $validator->validate($book);
+        if (count($errors) > 0)
         {
-            return $this->response(['error' => 'Russian name not specified']);
+            return $this->response(['error' => (string)$errors]);
         }
 
-        $name_en = $request->request->get('name_en');
-        if (!isset($name_en) || (trim($name_en) === ''))
-        {
-            return $this->response(['error' => 'English name not specified']);
-        }
+        $authors = array_filter(
+            explode(',', $request->request->get('authors')),
+            'is_numeric'
+        );
 
-        $authors = $request->request->get('authors');
-        if (!isset($authors) || (trim($authors) === ''))
-        {
-            return $this->response(['error' => 'Authors not specified']);
-        }
-
-        $name_ru = trim($name_ru);
-        $name_en = trim($name_en);
-        $authors = array_filter(explode(',', $authors), 'is_numeric');
         if (count($authors) < 1)
         {
             return $this->response(['error' => 'Authors not specified or invalid']);
@@ -101,10 +96,6 @@ class BookController extends AbstractController
         {
             return $this->response(['error' => 'Authors not found or invalid']);
         }
-
-        $book = new Book();
-        $book->setNameEn($name_en);
-        $book->setNameRu($name_ru);
 
         foreach ($authorsData as $author)
         {

@@ -6,17 +6,18 @@ use App\Repository\AuthorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=AuthorRepository::class)
+ * @UniqueEntity(
+ *     fields="name",
+ *     message="Author '{{ value }}' already exists"
+ * )
  */
 class Author implements \JsonSerializable
 {
-    /**
-     * Maximum name length
-     */
-    public const NAME_MAX_LENGTH = 1000;
-
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -25,7 +26,9 @@ class Author implements \JsonSerializable
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=1000)
+     * @ORM\Column(type="string", length=500, unique=true)
+     * @Assert\NotBlank
+     * @Assert\Length(max=500)
      */
     private $name;
 
@@ -51,7 +54,7 @@ class Author implements \JsonSerializable
 
     public function setName(string $name): self
     {
-        $this->name = mb_substr($name, 0, self::NAME_MAX_LENGTH);
+        $this->name = $name;
 
         return $this;
     }

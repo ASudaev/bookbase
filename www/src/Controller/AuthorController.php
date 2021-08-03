@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class AuthorController extends AbstractController
 {
@@ -57,28 +58,21 @@ class AuthorController extends AbstractController
      * @Route("/author/create", name="author_create", methods={"POST"})
      * @param Request $request
      * @param EntityManagerInterface $entityManager
-     * @param AuthorRepository $authorRepository
+     * @param ValidatorInterface $validator
      *
      * @return Response
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function create(Request $request, EntityManagerInterface $entityManager, AuthorRepository $authorRepository): Response
+    public function create(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): Response
     {
-        $name = $request->request->get('name');
-        if (!isset($name) || (trim($name) === ''))
-        {
-            return $this->response(['error' => 'Author name not specified']);
-        }
-
-        $name = trim($name);
-        $cloneFound = $authorRepository->findByNameStrict($name);
-        if ($cloneFound)
-        {
-            return $this->response(['error' => 'Author "' . $cloneFound->getName() . '" already exists']);
-        }
-
         $author = new Author();
-        $author->setName($name);
+        $author->setName(trim($request->request->get('name')));
+
+        $errors = $validator->validate($author);
+        if (count($errors) > 0)
+        {
+            return $this->response(['error' => (string)$errors]);
+        }
+
         $entityManager->persist($author);
         $entityManager->flush();
 

@@ -6,17 +6,13 @@ use App\Repository\BookRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=BookRepository::class)
  */
 class Book implements \JsonSerializable
 {
-    /**
-     * Maximum name length
-     */
-    public const NAME_MAX_LENGTH = 1000;
-
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -26,11 +22,15 @@ class Book implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=1000)
+     * @Assert\NotBlank
+     * @Assert\Length(max=1000)
      */
     private $name_en;
 
     /**
      * @ORM\Column(type="string", length=1000)
+     * @Assert\NotBlank
+     * @Assert\Length(max=1000)
      */
     private $name_ru;
 
@@ -56,7 +56,7 @@ class Book implements \JsonSerializable
 
     public function setNameEn(string $name_en): self
     {
-        $this->name_en = mb_substr($name_en, 0, self::NAME_MAX_LENGTH);
+        $this->name_en = $name_en;
 
         return $this;
     }
@@ -68,7 +68,7 @@ class Book implements \JsonSerializable
 
     public function setNameRu(string $name_ru): self
     {
-        $this->name_ru = mb_substr($name_ru, 0, self::NAME_MAX_LENGTH);
+        $this->name_ru = $name_ru;
 
         return $this;
     }
