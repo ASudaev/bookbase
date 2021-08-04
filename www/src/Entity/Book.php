@@ -6,14 +6,13 @@ use App\Repository\BookRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Knp\DoctrineBehaviors\Model\Translatable\TranslatableTrait;
 
 /**
  * @ORM\Entity(repositoryClass=BookRepository::class)
  */
-class Book implements TranslatableInterface,  \JsonSerializable
+class Book implements TranslatableInterface, \JsonSerializable
 {
     use TranslatableTrait;
 
@@ -38,25 +37,6 @@ class Book implements TranslatableInterface,  \JsonSerializable
     {
         return $this->id;
     }
-
-/*    public function getName(): ?string
-    {
-        $names = [];
-
-        if ($this->getNameEn())
-        {
-            $names[] = $this->getNameEn();
-        }
-
-        if ($this->getNameRu())
-        {
-            $names[] = $this->getNameRu();
-        }
-
-        return (count($names) > 0)
-            ? implode('|', $names)
-            : null;
-    }*/
 
     /**
      * @return Collection|Author[]

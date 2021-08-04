@@ -10,30 +10,13 @@ use Doctrine\Persistence\ObjectManager;
 
 class AppFixtures extends Fixture implements FixtureGroupInterface
 {
-    private const TEST_AUTHORS = [
-        1 => ['name' => 'Терри Пратчетт'],
-        2 => ['name' => 'Нил Гейман'],
-    ];
+    private const TEST_AUTHORS = [1 => ['name' => 'Терри Пратчетт'], 2 => ['name' => 'Нил Гейман'],];
 
-    private const TEST_BOOKS = [
-        [
-            'name_en' => 'The Colour of Magic',
-            'name_ru' => 'Цвет волшебства',
-            'authors' => [1]
-        ],
-        [
-            'name_en' => 'Good Omens',
-            'name_ru' => 'Благие знамения',
-            'authors' => [1, 2]
-        ],
-        [
-            'name_en' => 'American Gods',
-            'name_ru' => 'Американские боги',
-            'authors' => [1]
-        ]
-    ];
+    private const TEST_BOOKS = [['name_en' => 'The Colour of Magic', 'name_ru' => 'Цвет волшебства', 'authors' => [1]],
+                                ['name_en' => 'Good Omens', 'name_ru' => 'Благие знамения', 'authors' => [1, 2]],
+                                ['name_en' => 'American Gods', 'name_ru' => 'Американские боги', 'authors' => [1]]];
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $authors = [];
 

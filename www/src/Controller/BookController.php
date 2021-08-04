@@ -8,6 +8,7 @@ use App\Repository\AuthorRepository;
 use App\Repository\BookRepository;
 use App\Traits\ControllerJsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,9 +33,7 @@ class BookController extends AbstractController
             return $this->response([]);
         }
 
-        return $this->response(
-            $bookRepository->findByName(trim($name))
-        );
+        return $this->response($bookRepository->findByName(trim($name)));
     }
 
     /**
@@ -43,6 +42,7 @@ class BookController extends AbstractController
      * @param string $id
      *
      * @return Response
+     * @throws NonUniqueResultException
      */
     public function bookById(BookRepository $bookRepository, string $id): Response
     {
@@ -51,9 +51,7 @@ class BookController extends AbstractController
             return $this->response(null);
         }
 
-        return $this->response(
-            $bookRepository->findById($id)
-        );
+        return $this->response($bookRepository->findById($id));
     }
 
     /**
@@ -65,28 +63,23 @@ class BookController extends AbstractController
      *
      * @return Response
      */
-    public function create(
-        Request $request,
-        EntityManagerInterface $entityManager,
-        ValidatorInterface $validator,
-        AuthorRepository $authorRepository
-    ): Response
+    public function create(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator, AuthorRepository $authorRepository): Response
     {
-        $name_ru = trim($request->request->get('name_ru'));
-        if (($name_ru === '') || (mb_strlen($name_ru) > BookTranslation::MAX_NAME_LENGTH))
+        $nameRu = trim($request->request->get('name_ru'));
+        if (($nameRu === '') || (mb_strlen($nameRu) > BookTranslation::MAX_NAME_LENGTH))
         {
             return $this->response(['error' => 'Russian book name not specified or invalid']);
         }
 
-        $name_en = trim($request->request->get('name_en'));
-        if (($name_en === '') || (mb_strlen($name_en) > BookTranslation::MAX_NAME_LENGTH))
+        $nameEn = trim($request->request->get('name_en'));
+        if (($nameEn === '') || (mb_strlen($nameEn) > BookTranslation::MAX_NAME_LENGTH))
         {
             return $this->response(['error' => 'English book name not specified or invalid']);
         }
 
         $book = new Book();
-        $book->translate('ru')->setName($name_ru);
-        $book->translate('en')->setName($name_en);
+        $book->translate('ru')->setName($nameRu);
+        $book->translate('en')->setName($nameEn);
 
         $errors = $validator->validate($book);
         if (count($errors) > 0)
@@ -94,10 +87,7 @@ class BookController extends AbstractController
             return $this->response(['error' => (string)$errors]);
         }
 
-        $authors = array_filter(
-            explode(',', $request->request->get('authors')),
-            'is_numeric'
-        );
+        $authors = array_filter(explode(',', $request->request->get('authors')), 'is_numeric');
 
         if (count($authors) < 1)
         {

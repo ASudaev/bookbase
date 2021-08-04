@@ -6,6 +6,7 @@ use App\Entity\Author;
 use App\Repository\AuthorRepository;
 use App\Traits\ControllerJsonResponse;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,9 +31,7 @@ class AuthorController extends AbstractController
             return $this->response([]);
         }
 
-        return $this->response(
-            $authorRepository->findByName(trim($name))
-        );
+        return $this->response($authorRepository->findByName(trim($name)));
     }
 
     /**
@@ -41,6 +40,7 @@ class AuthorController extends AbstractController
      * @param string $id
      *
      * @return Response
+     * @throws NonUniqueResultException
      */
     public function authorById(AuthorRepository $authorRepository, string $id): Response
     {
@@ -49,9 +49,7 @@ class AuthorController extends AbstractController
             return $this->response(null);
         }
 
-        return $this->response(
-            $authorRepository->findById($id)
-        );
+        return $this->response($authorRepository->findById($id));
     }
 
     /**

@@ -36,23 +36,6 @@ class AuthorRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param string $name
-     *
-     * @return Author|null
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function findByNameStrict(string $name): ?Author
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.name LIKE :val')
-            ->setParameter('val', $name)
-            ->orderBy('a.id', 'ASC')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
-    /**
      * @param $id
      *
      * @return Author|null

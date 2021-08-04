@@ -69,7 +69,8 @@ class Author implements \JsonSerializable
 
     public function addBook(Book $book): self
     {
-        if (!$this->books->contains($book)) {
+        if (!$this->books->contains($book))
+        {
             $this->books[] = $book;
             $book->addAuthor($this);
         }
@@ -79,7 +80,8 @@ class Author implements \JsonSerializable
 
     public function removeBook(Book $book): self
     {
-        if ($this->books->removeElement($book)) {
+        if ($this->books->removeElement($book))
+        {
             $book->removeAuthor($this);
         }
 

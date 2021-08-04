@@ -80,11 +80,7 @@ class BookControllerTest extends WebTestCase
         $client->request(
             'POST',
             '/book/create',
-            [
-                'name_en' => self::TEST_NEW_BOOK_NAME_EN,
-                'name_ru' => self::TEST_NEW_BOOK_NAME_RU,
-                'authors' => $authorId
-            ]
+            ['name_en' => self::TEST_NEW_BOOK_NAME_EN, 'name_ru' => self::TEST_NEW_BOOK_NAME_RU, 'authors' => $authorId]
         );
 
         $this->assertResponseIsSuccessful();
@@ -102,7 +98,7 @@ class BookControllerTest extends WebTestCase
             || str_contains($data['Name'], self::TEST_NEW_BOOK_NAME_EN)
         );
         $this->assertIsArray($data['Author']);
-        $this->assertEquals(1, count($data['Author']));
+        $this->assertCount(1, $data['Author']);
         $this->assertArrayHasKey('Id', $data['Author'][0]);
         $this->assertArrayHasKey('Name', $data['Author'][0]);
         $this->assertEquals($authorId, $data['Author'][0]['Id']);
@@ -115,33 +111,21 @@ class BookControllerTest extends WebTestCase
         $client->request(
             'POST',
             '/book/create',
-            [
-                'name_en' => self::TEST_NEW_BOOK_NAME_EN,
-                'name_ru' => '',
-                'authors' => '0'
-            ]
+            ['name_en' => self::TEST_NEW_BOOK_NAME_EN, 'name_ru' => '', 'authors' => '0']
         );
         $this->checkForErrorResult($client);
 
         $client->request(
             'POST',
             '/book/create',
-            [
-                'name_en' => '',
-                'name_ru' => self::TEST_NEW_BOOK_NAME_RU,
-                'authors' => '0'
-            ]
+            ['name_en' => '', 'name_ru' => self::TEST_NEW_BOOK_NAME_RU, 'authors' => '0']
         );
         $this->checkForErrorResult($client);
 
         $client->request(
             'POST',
             '/book/create',
-            [
-                'name_en' => self::TEST_NEW_BOOK_NAME_EN,
-                'name_ru' => self::TEST_NEW_BOOK_NAME_RU,
-                'authors' => '0'
-            ]
+            ['name_en' => self::TEST_NEW_BOOK_NAME_EN, 'name_ru' => self::TEST_NEW_BOOK_NAME_RU, 'authors' => '0']
         );
         $this->checkForErrorResult($client);
     }
@@ -191,7 +175,7 @@ class BookControllerTest extends WebTestCase
      * @param int $id
      * @param string $name
      */
-    private function checkBookByIdResponse(KernelBrowser $client, int $id, string $name)
+    private function checkBookByIdResponse(KernelBrowser $client, int $id, string $name): void
     {
         $this->assertResponseIsSuccessful();
 
