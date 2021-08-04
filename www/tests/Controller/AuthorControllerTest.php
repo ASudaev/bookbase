@@ -2,19 +2,25 @@
 
 namespace App\Tests\Controller;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AuthorControllerTest extends WebTestCase
 {
     private const TEST_EXISTING_AUTHOR_NAME = 'Терри Пратчетт';
-    private const TEST_EXISTING_AUTHOR_ID = 1;
     private const TEST_NEW_AUTHOR_NAME = 'Тест Тестович Тестов';
 
-    public function testAuthorByIdSuccess(): void
+    /**
+     * Тестирует запрос /author/{id} с заданным ID
+     *
+     * @param KernelBrowser $client
+     * @param int $id
+     * @param string $name
+     */
+    private function testAuthorByIdSuccess(KernelBrowser $client, int $id, string $name): void
     {
-        $client = static::createClient();
-        $client->request('GET', '/author/' . self::TEST_EXISTING_AUTHOR_ID);
+        $client->request('GET', '/author/' . $id);
 
         $this->assertResponseIsSuccessful();
 
@@ -25,8 +31,8 @@ class AuthorControllerTest extends WebTestCase
         $this->assertIsArray($data);
         $this->assertArrayHasKey('Id', $data);
         $this->assertArrayHasKey('Name', $data);
-        $this->assertEquals(self::TEST_EXISTING_AUTHOR_ID, $data['Id']);
-        $this->assertEquals(self::TEST_EXISTING_AUTHOR_NAME, $data['Name']);
+        $this->assertEquals($id, $data['Id']);
+        $this->assertEquals($name, $data['Name']);
     }
 
     public function testAuthorByIdError(): void
@@ -60,8 +66,9 @@ class AuthorControllerTest extends WebTestCase
 
         $this->assertArrayHasKey('Id', $data[0]);
         $this->assertArrayHasKey('Name', $data[0]);
-        $this->assertEquals(self::TEST_EXISTING_AUTHOR_ID, $data[0]['Id']);
         $this->assertEquals(self::TEST_EXISTING_AUTHOR_NAME, $data[0]['Name']);
+
+        $this->testAuthorByIdSuccess($client, $data[0]['Id'], $data[0]['Name']);
     }
 
     public function testAuthorCreateSuccess(): void
