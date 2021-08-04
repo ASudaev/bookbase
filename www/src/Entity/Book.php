@@ -7,32 +7,22 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
+use Knp\DoctrineBehaviors\Model\Translatable\TranslatableTrait;
 
 /**
  * @ORM\Entity(repositoryClass=BookRepository::class)
  */
-class Book implements \JsonSerializable
+class Book implements TranslatableInterface,  \JsonSerializable
 {
+    use TranslatableTrait;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
     private $id;
-
-    /**
-     * @ORM\Column(type="string", length=1000)
-     * @Assert\NotBlank
-     * @Assert\Length(max=1000)
-     */
-    private $name_en;
-
-    /**
-     * @ORM\Column(type="string", length=1000)
-     * @Assert\NotBlank
-     * @Assert\Length(max=1000)
-     */
-    private $name_ru;
 
     /**
      * @ORM\ManyToMany(targetEntity=Author::class, inversedBy="books")
@@ -49,31 +39,7 @@ class Book implements \JsonSerializable
         return $this->id;
     }
 
-    public function getNameEn(): ?string
-    {
-        return $this->name_en;
-    }
-
-    public function setNameEn(string $name_en): self
-    {
-        $this->name_en = $name_en;
-
-        return $this;
-    }
-
-    public function getNameRu(): ?string
-    {
-        return $this->name_ru;
-    }
-
-    public function setNameRu(string $name_ru): self
-    {
-        $this->name_ru = $name_ru;
-
-        return $this;
-    }
-
-    public function getName(): ?string
+/*    public function getName(): ?string
     {
         $names = [];
 
@@ -90,7 +56,7 @@ class Book implements \JsonSerializable
         return (count($names) > 0)
             ? implode('|', $names)
             : null;
-    }
+    }*/
 
     /**
      * @return Collection|Author[]
@@ -120,10 +86,12 @@ class Book implements \JsonSerializable
     public function jsonSerialize(): array
     {
         $result = [
-            'Id' => $this->getId(),
-            'Name' => $this->getName(),
+            'Id'     => $this->getId(),
+            'Name'   => $this->translate()->getName()
+                ?? $this->translate('ru')->getName()
+                ?? $this->translate('en')->getName(),
             'Author' => [],
-            ];
+        ];
 
         $authors = $this->getAuthors();
 

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Book;
+use App\Entity\BookTranslation;
 use App\Repository\AuthorRepository;
 use App\Repository\BookRepository;
 use App\Traits\ControllerJsonResponse;
@@ -37,7 +38,7 @@ class BookController extends AbstractController
     }
 
     /**
-     * @Route("/book/{id}", name="book_by_id", methods={"GET"})
+     * @Route("/{_locale<ru|en>}/book/{id}", name="book_by_id", methods={"GET"})
      * @param BookRepository $bookRepository
      * @param string $id
      *
@@ -71,9 +72,21 @@ class BookController extends AbstractController
         AuthorRepository $authorRepository
     ): Response
     {
+        $name_ru = trim($request->request->get('name_ru'));
+        if (($name_ru === '') || (mb_strlen($name_ru) > BookTranslation::MAX_NAME_LENGTH))
+        {
+            return $this->response(['error' => 'Russian book name not specified or invalid']);
+        }
+
+        $name_en = trim($request->request->get('name_en'));
+        if (($name_en === '') || (mb_strlen($name_en) > BookTranslation::MAX_NAME_LENGTH))
+        {
+            return $this->response(['error' => 'English book name not specified or invalid']);
+        }
+
         $book = new Book();
-        $book->setNameRu(trim($request->request->get('name_ru')));
-        $book->setNameEn(trim($request->request->get('name_en')));
+        $book->translate('ru')->setName($name_ru);
+        $book->translate('en')->setName($name_en);
 
         $errors = $validator->validate($book);
         if (count($errors) > 0)
@@ -103,6 +116,7 @@ class BookController extends AbstractController
         }
 
         $entityManager->persist($book);
+        $book->mergeNewTranslations();
         $entityManager->flush();
 
         return $this->response($book);

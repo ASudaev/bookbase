@@ -27,11 +27,11 @@ class BookRepository extends ServiceEntityRepository
     public function findByName(string $name): array
     {
         return $this->createQueryBuilder('b')
-            ->where('b.name_en LIKE :val')
-            ->orWhere('b.name_ru LIKE :val')
+            ->addSelect('translation')
+            ->leftJoin('b.translations', 'translation')
+            ->andWhere('translation.name LIKE :val')
             ->setParameter('val', '%' . $name . '%')
-            ->orderBy('b.name_en', 'ASC')
-            ->orderBy('b.name_ru', 'ASC')
+            ->orderBy('translation.name', 'ASC')
             ->setMaxResults(100)
             ->getQuery()
             ->getResult();

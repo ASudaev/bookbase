@@ -47,13 +47,14 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         foreach (self::TEST_BOOKS as $bookData)
         {
             $book = new Book();
-            $book->setNameRu($bookData['name_ru']);
-            $book->setNameEn($bookData['name_en']);
+            $book->translate('ru')->setName($bookData['name_ru']);
+            $book->translate('en')->setName($bookData['name_en']);
             foreach ($bookData['authors'] as $authorId)
             {
                 $book->addAuthor($authors[$authorId]);
             }
             $manager->persist($book);
+            $book->mergeNewTranslations();
         }
 
         $manager->flush();
