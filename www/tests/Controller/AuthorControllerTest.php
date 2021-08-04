@@ -26,6 +26,7 @@ class AuthorControllerTest extends WebTestCase
         $this->assertArrayHasKey('Id', $data);
         $this->assertArrayHasKey('Name', $data);
         $this->assertEquals(self::TEST_EXISTING_AUTHOR_ID, $data['Id']);
+        $this->assertEquals(self::TEST_EXISTING_AUTHOR_NAME, $data['Name']);
     }
 
     public function testAuthorByIdError(): void

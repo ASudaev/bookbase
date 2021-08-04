@@ -30,6 +30,8 @@ class BookControllerTest extends WebTestCase
         $this->assertArrayHasKey('Name', $data);
         $this->assertArrayHasKey('Author', $data);
         $this->assertEquals(self::TEST_EXISTING_BOOK_ID, $data['Id']);
+        $this->assertTrue(str_contains($data['Name'], self::TEST_EXISTING_BOOK_NAME_RU));
+        $this->assertTrue(str_contains($data['Name'], self::TEST_EXISTING_BOOK_NAME_EN));
         $this->assertIsArray($data['Author']);
         $this->assertGreaterThan(0, count($data['Author']));
         $this->assertArrayHasKey('Id', $data['Author'][0]);
