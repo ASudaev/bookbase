@@ -43,6 +43,7 @@ services:
     volumes:
       - "./www:/var/www/bookbase"
       - "./install/install.sh:/install.sh"
+      - "./install/install_php.ini:/usr/local/etc/php/conf.d/install_php.ini"
     command:
       ["/install.sh"]
     depends_on:
